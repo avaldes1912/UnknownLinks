@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚠️ Security Warning — Phishing Awareness Simulation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+      --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem;
+      --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
+      --space-16: 4rem; --space-20: 5rem;
+      --radius-sm: 0.375rem; --radius-md: 0.5rem;
+      --radius-lg: 0.75rem; --radius-xl: 1rem; --radius-full: 9999px;
+      --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+      --font-body: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="dark"] {
+      --color-bg: #0d0d0f;
+      --color-surface: #131316;
+      --color-surface-2: #18181c;
+      --color-surface-offset: #1e1e23;
+      --color-border: #2a2a32;
+      --color-divider: #22222a;
+      --color-text: #e8e8ed;
+      --color-text-muted: #8a8a9a;
+      --color-text-faint: #4a4a5a;
+      --color-danger: #ff4d4d;
+      --color-danger-hover: #ff2020;
+      --color-danger-glow: rgba(255, 77, 77, 0.15);
+      --color-danger-border: rgba(255, 77, 77, 0.3);
+      --color-warning: #f59e0b;
+      --color-warning-glow: rgba(245, 158, 11, 0.12);
+      --color-success: #22c55e;
+      --color-success-glow: rgba(34, 197, 94, 0.12);
+      --color-primary: #6366f1;
+      --color-primary-glow: rgba(99, 102, 241, 0.15);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.5);
+      --shadow-danger: 0 0 40px rgba(255, 77, 77, 0.12), 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--color-text);
+      background: var(--color-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-6) var(--space-4);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,77,77,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,77,77,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: grid-pulse 6s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,77,77,0.06) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes grid-pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    /* === TOP WARNING BANNER === */
+    .top-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: var(--color-danger);
+      color: #fff;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      text-align: center;
+      padding: var(--space-2) var(--space-4);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      z-index: 100;
+      animation: banner-flash 2s ease-in-out infinite;
+    }
+    @keyframes banner-flash {
+      0%, 100% { background: #c0392b; }
+      50% { background: #e74c3c; }
+    }
+
+    /* === MAIN CARD === */
+    .main-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 640px;
+      margin-top: var(--space-10);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .warning-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-danger-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-10) var(--space-8);
+      box-shadow: var(--shadow-danger);
+      position: relative;
+      overflow: hidden;
+      animation: card-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes card-appear {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Glow pulse on card edge */
+    .warning-card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, rgba(255,77,77,0.4) 0%, transparent 40%, transparent 60%, rgba(255,77,77,0.2) 100%);
+      pointer-events: none;
+      animation: border-glow 3s ease-in-out infinite;
+    }
+    @keyframes border-glow {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.8; }
+    }
+
+    /* === SHIELD ICON === */
+    .icon-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto var(--space-6);
+      background: var(--color-danger-glow);
+      border: 1px solid var(--color-danger-border);
+      border-radius: var(--radius-full);
+      animation: icon-pulse 2s ease-in-out infinite;
+    }
+    @keyframes icon-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(255,77,77,0.3); }
+      50% { box-shadow: 0 0 0 12px rgba(255,77,77,0); }
+    }
+
+    .icon-wrapper svg {
+      width: 40px; height: 40px;
+      color: var(--color-danger);
+    }
+
+    /* === TYPOGRAPHY === */
+    .warning-label {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--color-danger);
+      text-align: center;
+      margin-bottom: var(--space-3);
+    }
+
+    .main-heading {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      line-height: 1.1;
+      text-align: center;
+      color: var(--color-text);
+      margin-bottom: var(--space-4);
+    }
+
+    .main-heading span {
+      color: var(--color-danger);
+    }
+
+    .description {
+      font-size: var(--text-base);
+      color: var(--color-text-muted);
+      line-height: 1.7;
+      text-align: center;
+      max-width: 52ch;
+      margin: 0 auto var(--space-8);
+    }
+
+    /* === DIVIDER === */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--color-divider);
+      margin: var(--space-6) 0;
+    }
+
+    /* === RULES LIST === */
+    .rules-heading {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    .rules-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .rule-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      transition: border-color var(--transition-interactive), background var(--transition-interactive);
+    }
+
+    .rule-item:hover {
+      border-color: rgba(255,77,77,0.3);
+      background: var(--color-surface-offset);
+    }
+
+    .rule-icon {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+    }
+
+    .rule-icon.red { background: rgba(255,77,77,0.15); color: var(--color-danger); }
+    .rule-icon.yellow { background: rgba(245,158,11,0.15); color: var(--color-warning); }
+    .rule-icon.green { background: rgba(34,197,94,0.15); color: var(--color-success); }
+    .rule-icon.blue { background: rgba(99,102,241,0.15); color: var(--color-primary); }
+
+    .rule-text {
+      flex: 1;
+    }
+
+    .rule-title {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-text);
+      margin-bottom: var(--space-1);
+    }
+
+    .rule-desc {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    /* === URL EXAMPLE === */
+    .url-example {
+      background: var(--color-surface-offset);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-5);
+      margin-top: var(--space-6);
+    }
+
+    .url-example-label {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-3);
+    }
+
+    .url-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+
+    .url-badge {
+      flex-shrink: 0;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .url-badge.safe { background: rgba(34,197,94,0.15); color: var(--color-success); }
+    .url-badge.fake { background: rgba(255,77,77,0.15); color: var(--color-danger); }
+
+    .url-text {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      word-break: break-all;
+    }
+
+    .url-text .highlight-bad {
+      color: var(--color-danger);
+      font-weight: 600;
+    }
+
+    .url-text .highlight-good {
+      color: var(--color-success);
+      font-weight: 600;
+    }
+
+    /* === BOTTOM CTA === */
+    .cta-section {
+      text-align: center;
+      margin-top: var(--space-8);
+    }
+
+    .cta-text {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: var(--color-danger);
+      color: #fff;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      padding: var(--space-3) var(--space-6);
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background var(--transition-interactive), transform var(--transition-interactive), box-shadow var(--transition-interactive);
+      box-shadow: 0 4px 16px rgba(255,77,77,0.25);
+    }
+
+    .btn-primary:hover {
+      background: var(--color-danger-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(255,77,77,0.35);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    /* === QUIZ SECTION === */
+    .quiz-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      box-shadow: var(--shadow-md);
+      animation: card-appear 0.6s 0.15s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .quiz-heading {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+
+    .quiz-sub {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-6);
+    }
+
+    .quiz-question {
+      display: none;
+    }
+    .quiz-question.active {
+      display: block;
+      animation: question-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes question-in {
+      from { opacity: 0; clip-path: inset(10% 0 0 0); }
+      to { opacity: 1; clip-path: inset(0 0 0 0); }
+    }
+
+    .question-text {
+      font-size: var(--text-base);
+      font-weight: 500;
+      margin-bottom: var(--space-4);
+      line-height: 1.5;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .option-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      width: 100%;
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      color: var(--color-text);
+      cursor: pointer;
+      transition: all var(--transition-interactive);
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--color-primary);
+      background: var(--color-surface-offset);
+    }
+
+    .option-btn.correct {
+      border-color: var(--color-success);
+      background: rgba(34,197,94,0.08);
+      color: var(--color-success);
+    }
+
+    .option-btn.wrong {
+      border-color: var(--color-danger);
+      background: rgba(255,77,77,0.08);
+      color: var(--color-danger);
+    }
+
+    .option-btn .letter {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      border-radius: var(--radius-full);
+      background: var(--color-surface-offset);
+      border: 1px solid var(--color-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .feedback-msg {
+      display: none;
+      margin-top: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: 500;
+    }
+    .feedback-msg.show { display: block; }
+    .feedback-msg.good {
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.3);
+      color: var(--color-success);
+    }
+    .feedback-msg.bad {
+      background: rgba(255,77,77,0.1);
+      border: 1px solid rgba(255,77,77,0.3);
+      color: var(--color-danger);
+    }
+
+    .next-btn {
+      display: none;
+      margin-top: var(--space-4);
+      padding: var(--space-2) var(--space-5);
+      background: var(--color-primary);
+      color: #fff;
+      font-size: var(--text-sm);
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-interactive);
+    }
+    .next-btn:hover { opacity: 0.85; }
+    .next-btn.show { display: inline-block; }
+
+    /* Progress bar */
+    .progress-bar {
+      display: flex;
+      gap: var(--space-1);
+      margin-bottom: var(--space-5);
+    }
+    .progress-dot {
+      height: 4px;
+      flex: 1;
+      background: var(--color-border);
+      border-radius: var(--radius-full);
+      transition: background 0.3s;
+    }
+    .progress-dot.done { background: var(--color-success); }
+    .progress-dot.active { background: var(--color-primary); }
+
+    /* === SCORE SCREEN === */
+    .score-screen {
+      display: none;
+      text-align: center;
+      padding: var(--space-4) 0;
+    }
+    .score-screen.show { display: block; }
+    .score-number {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      margin: var(--space-4) 0 var(--space-2);
+    }
+    .score-label { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+    /* === FOOTER === */
+    .footer-note {
+      text-align: center;
+      font-size: var(--text-xs);
+      color: var(--color-text-faint);
+      margin-top: var(--space-4);
+      animation: card-appear 0.6s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .footer-note strong { color: var(--color-text-muted); }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 480px) {
+      .warning-card { padding: var(--space-6) var(--space-5); }
+      .quiz-card { padding: var(--space-6); }
+      .main-heading { font-size: var(--text-xl); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP BANNER -->
+  <div class="top-banner">⚠ Security Awareness Training — Simulation Only</div>
+
+  <main class="main-container">
+
+    <!-- === WARNING CARD === -->
+    <div class="warning-card">
+      <div class="icon-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+
+      <div class="warning-label">⚡ Simulation — Cybersecurity Awareness</div>
+
+      <h1 class="main-heading">You just clicked a <span>suspicious link</span></h1>
+
+      <p class="description">
+        In a real attack, this page could have stolen your credentials, installed malware, or hijacked your session. You are safe — but this is exactly how phishing works.
+      </p>
+
+      <hr class="divider">
+
+      <p class="rules-heading">🛡 How to protect yourself</p>
+      <ul class="rules-list">
+        <li class="rule-item">
+          <div class="rule-icon red">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div class="rule-text">
+            <div class="rule-title">Never click links from unknown senders</div>
+            <div class="rule-desc">Attackers send messages that look legitimate — from banks, HR, IT support, or colleagues. Always verify the sender directly.</div>
+          </div>
+        </li>
+        <li class="rule-item">
+          <div class="rule-icon yellow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="rule-text">
+            <div class="rule-title">Hover before you click</div>
+            <div class="rule-desc">Always hover over a link to preview the real URL in the browser status bar. If the destination looks strange — don't click.</div>
+          </div>
+        </li>
+        <li class="rule-item">
+          <div class="rule-icon green">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="rule-text">
+            <div class="rule-title">Check for HTTPS — but don't trust it blindly</div>
+            <div class="rule-desc">The padlock icon means the connection is encrypted, NOT that the site is legitimate. Phishing sites use HTTPS too.</div>
+          </div>
+        </li>
+        <li class="rule-item">
+          <div class="rule-icon blue">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div class="rule-text">
+            <div class="rule-title">Enable Multi-Factor Authentication (MFA)</div>
+            <div class="rule-desc">Even if attackers steal your password, MFA stops them from logging in. Enable it on every critical account.</div>
+          </div>
+        </li>
+      </ul>
+
+      <!-- URL EXAMPLES -->
+      <div class="url-example">
+        <div class="url-example-label">🔍 Can you spot the fake URL?</div>
+        <div class="url-row">
+          <span class="url-badge safe">Real</span>
+          <span class="url-text"><span class="highlight-good">paypal.com</span>/login</span>
+        </div>
+        <div class="url-row">
+          <span class="url-badge fake">Fake</span>
+          <span class="url-text"><span class="highlight-bad">paypal-secure-login.com</span>/login</span>
+        </div>
+        <div class="url-row">
+          <span class="url-badge fake">Fake</span>
+          <span class="url-text">secure.<span class="highlight-bad">paypa1.com</span>/update</span>
+        </div>
+      </div>
+
+      <div class="cta-section">
+        <p class="cta-text">Test your skills with a quick awareness quiz below ↓</p>
+      </div>
+    </div>
+
+    <!-- === QUIZ CARD === -->
+    <div class="quiz-card">
+      <h2 class="quiz-heading">🧠 Quick Awareness Quiz</h2>
+      <p class="quiz-sub">3 questions · Takes less than 1 minute</p>
+
+      <!-- Progress -->
+      <div class="progress-bar" id="progress-bar">
+        <div class="progress-dot active" id="dot-0"></div>
+        <div class="progress-dot" id="dot-1"></div>
+        <div class="progress-dot" id="dot-2"></div>
+      </div>
+
+      <!-- Q1 -->
+      <div class="quiz-question active" id="q0">
+        <p class="question-text">You receive an urgent email from "IT Support" asking you to click a link and reset your password immediately. What should you do?</p>
+        <div class="options">
+          <button class="option-btn" onclick="answer(this, false, 0)"><span class="letter">A</span> Click the link — it sounds urgent</button>
+          <button class="option-btn" onclick="answer(this, false, 0)"><span class="letter">B</span> Reply to the email and ask if it's real</button>
+          <button class="option-btn" onclick="answer(this, true, 0)"><span class="letter">C</span> Go directly to the company portal and check your account</button>
+          <button class="option-btn" onclick="answer(this, false, 0)"><span class="letter">D</span> Forward it to your team to let them decide</button>
+        </div>
+        <div class="feedback-msg" id="fb0"></div>
+        <button class="next-btn" id="next0" onclick="nextQuestion(1)">Next question →</button>
+      </div>
+
+      <!-- Q2 -->
+      <div class="quiz-question" id="q1">
+        <p class="question-text">A link in a chat message shows: <code style="font-family:var(--font-mono);color:var(--color-warning)">https://microsoft-support.helpdesk-login.net/reset</code>. Is this safe?</p>
+        <div class="options">
+          <button class="option-btn" onclick="answer(this, false, 1)"><span class="letter">A</span> Yes — it uses HTTPS so it's secure</button>
+          <button class="option-btn" onclick="answer(this, true, 1)"><span class="letter">B</span> No — the real domain is helpdesk-login.net, not microsoft.com</button>
+          <button class="option-btn" onclick="answer(this, false, 1)"><span class="letter">C</span> Probably fine if the message came from a colleague</button>
+          <button class="option-btn" onclick="answer(this, false, 1)"><span class="letter">D</span> Safe if you have antivirus installed</button>
+        </div>
+        <div class="feedback-msg" id="fb1"></div>
+        <button class="next-btn" id="next1" onclick="nextQuestion(2)">Next question →</button>
+      </div>
+
+      <!-- Q3 -->
+      <div class="quiz-question" id="q2">
+        <p class="question-text">Which of the following is the BEST defense against phishing attacks?</p>
+        <div class="options">
+          <button class="option-btn" onclick="answer(this, false, 2)"><span class="letter">A</span> Having a strong antivirus software</button>
+          <button class="option-btn" onclick="answer(this, false, 2)"><span class="letter">B</span> Using a VPN at all times</button>
+          <button class="option-btn" onclick="answer(this, true, 2)"><span class="letter">C</span> Awareness training + MFA + verifying links before clicking</button>
+          <button class="option-btn" onclick="answer(this, false, 2)"><span class="letter">D</span> Never opening emails from unknown senders</button>
+        </div>
+        <div class="feedback-msg" id="fb2"></div>
+        <button class="next-btn" id="next2" onclick="showScore()">See my score →</button>
+      </div>
+
+      <!-- Score screen -->
+      <div class="score-screen" id="score-screen">
+        <div id="score-emoji" style="font-size:2.5rem;">🎯</div>
+        <div class="score-number" id="score-number">0/3</div>
+        <div class="score-label" id="score-label">Keep learning — cybersecurity awareness saves organizations.</div>
+        <hr class="divider" style="margin-top:var(--space-6)">
+        <p style="font-size:var(--text-sm);color:var(--color-text-muted);margin-top:var(--space-4)">
+          Share this page with your team to spread awareness. <strong style="color:var(--color-text)">Every click matters.</strong>
+        </p>
+        <button class="next-btn show" style="margin-top:var(--space-4);background:var(--color-success);" onclick="restartQuiz()">🔁 Restart quiz</button>
+      </div>
+    </div>
+
+    <p class="footer-note">
+      <strong>This is a controlled simulation</strong> for cybersecurity awareness training. No data was collected. No harm was done. · Made for educators &amp; security teams.
+    </p>
+
+  </main>
+
+  <script>
+    let score = 0;
+    const feedbacks = [
+      {
+        good: "✅ Correct! Always navigate to official portals directly. Never use links in emails for sensitive actions.",
+        bad: "❌ This is what attackers count on. Urgency is a manipulation tactic. Go directly to the official site."
+      },
+      {
+        good: "✅ Exactly right! In a URL, the real domain is always the last part before the first slash. Here it's helpdesk-login.net — not Microsoft.",
+        bad: "❌ HTTPS only encrypts the connection, it does NOT verify the site owner. Phishing sites use HTTPS all the time."
+      },
+      {
+        good: "✅ Correct! A layered defense — awareness + MFA + link verification — is far more effective than any single tool.",
+        bad: "❌ Tools help, but human awareness and MFA together are the strongest shields against phishing."
+      }
+    ];
+
+    function answer(btn, isCorrect, qIndex) {
+      const options = btn.closest('.options').querySelectorAll('.option-btn');
+      options.forEach(o => o.disabled = true);
+      btn.classList.add(isCorrect ? 'correct' : 'wrong');
+
+      if (isCorrect) {
+        score++;
+        btn.querySelector('.letter').textContent = '✓';
+      } else {
+        btn.querySelector('.letter').textContent = '✗';
+        // Highlight the correct answer
+        options.forEach(o => {
+          if (o.onclick.toString().includes('true')) o.classList.add('correct');
+        });
+      }
+
+      const fb = document.getElementById('fb' + qIndex);
+      fb.textContent = isCorrect ? feedbacks[qIndex].good : feedbacks[qIndex].bad;
+      fb.className = 'feedback-msg show ' + (isCorrect ? 'good' : 'bad');
+
+      const nextBtn = document.getElementById('next' + qIndex);
+      nextBtn.classList.add('show');
+    }
+
+    function nextQuestion(index) {
+      document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+      document.getElementById('q' + index).classList.add('active');
+
+      document.querySelectorAll('.progress-dot').forEach((d, i) => {
+        d.className = 'progress-dot' + (i < index ? ' done' : i === index ? ' active' : '');
+      });
+    }
+
+    function showScore() {
+      document.querySelectorAll('.quiz-question').forEach(q => q.classList.remove('active'));
+      document.querySelectorAll('.progress-dot').forEach(d => d.className = 'progress-dot done');
+
+      const screen = document.getElementById('score-screen');
+      screen.classList.add('show');
+
+      const emojis = ['😓', '🤔', '💪', '🏆'];
+      document.getElementById('score-emoji').textContent = emojis[score];
+      document.getElementById('score-number').textContent = score + '/3';
+
+      const labels = [
+        'Keep studying — phishing is the #1 threat vector.',
+        'Getting there! Review the tips above and try again.',
+        'Good job! One miss — review that question.',
+        'Perfect score! You're a security-aware professional. 🎉'
+      ];
+      document.getElementById('score-label').textContent = labels[score];
+    }
+
+    function restartQuiz() {
+      score = 0;
+      document.getElementById('score-screen').classList.remove('show');
+      document.querySelectorAll('.quiz-question').forEach(q => {
+        q.classList.remove('active');
+        q.querySelectorAll('.option-btn').forEach(b => {
+          b.disabled = false;
+          b.classList.remove('correct', 'wrong');
+          b.querySelector('.letter').textContent = b.getAttribute('data-letter') || b.querySelector('.letter').textContent;
+        });
+        q.querySelectorAll('.feedback-msg').forEach(f => f.className = 'feedback-msg');
+        q.querySelectorAll('.next-btn').forEach(n => n.classList.remove('show'));
+      });
+      // restore letters
+      const letters = ['A','B','C','D'];
+      document.querySelectorAll('.options').forEach(opts => {
+        opts.querySelectorAll('.option-btn').forEach((b, i) => {
+          b.querySelector('.letter').textContent = letters[i];
+        });
+      });
+      document.getElementById('q0').classList.add('active');
+      document.querySelectorAll('.progress-dot').forEach((d, i) => {
+        d.className = 'progress-dot' + (i === 0 ? ' active' : '');
+      });
+    }
+  </script>
+
+</body>
+</html>
